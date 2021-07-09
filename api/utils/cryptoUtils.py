@@ -34,11 +34,11 @@ async def create_access_token(*, data: dict, expire_delta: timedelta = None):
     }
 
 
-async def get_user_id_by_token(token: SecretStr, db: Session):
+async def get_user_id_by_token(token: str, db: Session):
     if await is_token_blacklisted(token, db):
         raise HTTPException(status_code=401, detail='Invalid token')
     try:
-        data = jwt.decode(token.get_secret_value(), consts.SECRET_KEY, algorithms=consts.CRYPTO_ALGORITHM)
+        data = jwt.decode(token, consts.SECRET_KEY, algorithms=consts.CRYPTO_ALGORITHM)
     except jwt.exceptions.DecodeError:
         raise HTTPException(status_code=401, detail='Token expire')
     return schema.UserToken(**data).owner_id

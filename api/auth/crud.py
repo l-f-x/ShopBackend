@@ -35,5 +35,5 @@ async def add_token_to_blacklist(token: SecretStr, db: Session):
         raise HTTPException(status_code=400, detail='This token already destroyed')
 
 
-async def is_token_blacklisted(token: SecretStr, db: Session):
-    return db.query(models.TokenBlacklist).filter(models.TokenBlacklist.token == token.get_secret_value()).first()
+async def is_token_blacklisted(token: str, db: Session):
+    return db.query(models.TokenBlacklist).filter(models.TokenBlacklist.token == token).first()

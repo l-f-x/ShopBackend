@@ -1,0 +1,17 @@
+fastapi
+uvicorn
+databases
+sqlalchemy
+pydantic
+pydantic[dotenv]
+asyncpg
+psycopg2
+starlette
+pydantic[email]
+passlib
+bcrypt
+python-multipart
+pyjwt
+alembic
+binascii
+pillow

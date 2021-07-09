@@ -3,7 +3,7 @@ from passlib.context import CryptContext
 from pydantic import SecretStr
 import jwt
 from sqlalchemy.orm import Session
-
+from api.exceptions.auth_exception import *
 from api.auth.crud import is_token_blacklisted
 from api.utils import consts, schema
 from datetime import datetime, timedelta
@@ -36,9 +36,9 @@ async def create_access_token(*, data: dict, expire_delta: timedelta = None):
 
 async def get_user_id_by_token(token: str, db: Session):
     if await is_token_blacklisted(token, db):
-        raise HTTPException(status_code=401, detail='Invalid token')
+        raise InvalidTokenException
     try:
         data = jwt.decode(token, consts.SECRET_KEY, algorithms=consts.CRYPTO_ALGORITHM)
     except jwt.exceptions.DecodeError:
-        raise HTTPException(status_code=401, detail='Token expire')
+        raise TokenExpireException
     return schema.UserToken(**data).owner_id

@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
-
+from api.exceptions.user_exceptions import *
+from api.exceptions.auth_exception import *
 from api.utils import cryptoUtils, orm_schema
 from api.auth import crud, schema
 from api.utils.dbUtils import SessionLocal
@@ -22,7 +23,7 @@ async def register(user: schema.UserCreate, db: Session = Depends(get_db)):
     # check if user exist
     result = await crud.is_user_exist(user.login, db)
     if result:
-        raise HTTPException(status_code=400, detail='This email already exist')
+        raise EmailUsedException
     # add new user if not
     await crud.add_user(user, db)
     return orm_schema.UserBase(**user.dict())
@@ -33,11 +34,11 @@ async def login(form: OAuth2PasswordRequestForm = Depends(), db: Session = Depen
     # check if user exist
     result = await crud.is_user_exist(form.username, db)
     if not result:
-        raise HTTPException(status_code=400, detail='User not found')
+        raise UserNotFoundException
     # check password
     verification = cryptoUtils.verify_password(form.password, result.password)
     if not verification:
-        raise HTTPException(status_code=400, detail='Incorrect password')
+        raise InvalidPasswordException
     response = await cryptoUtils.create_access_token(
         data={'owner_id': result.id}
     )

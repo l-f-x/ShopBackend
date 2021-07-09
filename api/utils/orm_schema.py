@@ -23,6 +23,7 @@ class PhotoCreate(Photo):
 
 class UserBase(BaseModel):
     login: EmailStr
+    balance: int
     real_name: str = Field(..., example="Ivan Ivanov")
 
     @validator('real_name')

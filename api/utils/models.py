@@ -13,6 +13,7 @@ class User(Base):
     login = Column(String(100), unique=True, nullable=False)
     password = Column(String(100), nullable=False)
     real_name = Column(String(50), nullable=False)
+    balance = Column(Integer, nullable=False, default=0)
     register_date = Column(DateTime, nullable=False, default=now())
     status = Column(String(1), default='1', nullable=False)
     role = Column(String(10), default='user', nullable=False)
@@ -43,4 +44,5 @@ class Photo(Base):
     owner_id = Column(Integer, ForeignKey('users.id'), nullable=False)
     upload_date = Column(DateTime, default=now())
     photo = Column(BYTEA)
+    is_selected_avatar = Column(Boolean, nullable=False, default=True)
     owner = relationship("User", back_populates="photos")

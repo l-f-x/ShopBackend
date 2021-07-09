@@ -1,5 +1,5 @@
-import io
-
+from api.exceptions.user_exceptions import *
+import sqlalchemy.orm.exc
 from sqlalchemy.orm import Session
 
 from api.user import schema
@@ -28,6 +28,10 @@ async def delete_account(user_id: int, db: Session):
 
 
 async def upload_photo(oid: int, file: UploadFile, db: Session):
+    actual_avatar = await get_avatar(oid, db)
+    if actual_avatar:
+        actual_avatar.update({models.Photo.is_selected_avatar: False}, synchronize_session=False)
+        db.commit()
     db_photo = models.Photo(
         owner_id=oid,
         photo=await file.read()
@@ -50,8 +54,34 @@ async def get_photo(photo_id: int, user_id: int, db: Session):
     if data.owner_id == user_id:
         return data.photo
     else:
-        raise HTTPException(status_code=403, detail="You haven't access to this photo")
+        raise AccessDeniedException
 
 
 async def get_user_photos_count(owner_id: int, db: Session):
     return len(db.query(models.User).filter(models.User.id == owner_id).first().photos)
+
+
+async def get_avatar(owner_id: int, db: Session):
+    try:
+        return db.query(models.Photo).filter(models.Photo.owner_id == owner_id, models.Photo.is_selected_avatar)
+    except sqlalchemy.orm.exc.NoResultFound:
+        return
+
+
+async def get_user_role(user_id: int, db: Session):
+    return db.query(models.User.role).filter(models.User.id == user_id).first()[0]
+
+
+async def get_balance(user_id: int, db: Session):
+    return db.query(models.User.balance).filter(models.User.id == user_id).first()[0]
+
+
+async def add_to_balance(body: schema.AddBalance, db: Session):
+    new_balance = await get_balance(body.user_to_add, db) + body.amount
+    db.query(models.User).filter(models.User.id == body.user_to_add).update({models.User.balance: new_balance})
+    db.commit()
+    return 'New user balance is ' + str(new_balance)
+
+
+async def is_user_exits(user_id: int, db: Session):
+    return db.query(models.User).filter(models.User.id == user_id).first()

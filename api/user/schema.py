@@ -20,3 +20,13 @@ class ChangeRealname(BaseModel):
 
 class PhotoId(orm_schema.Photo):
     photo_id: int
+
+
+class AddBalance(BaseModel):
+    amount: int
+    user_to_add: int
+
+    @validator('amount')
+    def validator(cls, v):
+        if v > 0:
+            return v

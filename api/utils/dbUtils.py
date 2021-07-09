@@ -1,8 +1,11 @@
 import databases
 import sqlalchemy
 from functools import lru_cache
+
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+
 from api import config
-from api.models import metadata
 
 
 @lru_cache()
@@ -24,6 +27,16 @@ def database_pgsql_url_config():
                settings().DB_DATABASE)
 
 
-database = databases.Database(database_pgsql_url_config())
+# database = databases.Database(database_pgsql_url_config())
 engine = sqlalchemy.create_engine(database_pgsql_url_config())
-metadata.create_all(engine)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+Base = declarative_base()
+
+
+async def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+# metadata.create_all(engine)

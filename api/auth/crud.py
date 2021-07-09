@@ -1,7 +1,7 @@
 import asyncpg.exceptions
 from pydantic import SecretStr
 from fastapi import HTTPException
-from api.auth.schema import UserCreate
+from api.auth import schema
 from api.utils import cryptoUtils
 from sqlalchemy.orm import Session
 from api.utils import orm_schema, models
@@ -12,8 +12,7 @@ async def is_user_exist(email: str, db: Session):
     return db.query(models.User).filter(models.User.login == email).first()
 
 
-async def add_user(user: orm_schema.UserCreate, db: Session):
-    print(user)
+async def add_user(user: schema.UserCreate, db: Session):
     db_user = models.User(
         login=user.login,
         password=cryptoUtils.hash_password(user.password),
@@ -25,16 +24,16 @@ async def add_user(user: orm_schema.UserCreate, db: Session):
     return db_user
 
 
-async def add_token_to_blacklist(token: SecretStr, db):
-    query = 'insert into blacklisted_tokens values(:token)'
-    # try:
-    #     return await database.execute(query,
-    #                                   values={'token': token.get_secret_value()})
-    # except asyncpg.exceptions.UniqueViolationError:
-    #     raise HTTPException(status_code=400, detail='This token already destroyed')
+async def add_token_to_blacklist(token: SecretStr, db: Session):
+    try:
+        db_token = models.TokenBlacklist(
+            token=token.get_secret_value()
+        )
+        db.add(db_token)
+        db.commit()
+    except asyncpg.exceptions.UniqueViolationError:
+        raise HTTPException(status_code=400, detail='This token already destroyed')
 
 
-async def is_token_blacklisted(token: SecretStr, db):
-    query = 'select * from blacklisted_tokens where token=:token'
-    # return await database.fetch_one(query,
-    #                                 values={'token': token.get_secret_value()})
+async def is_token_blacklisted(token: SecretStr, db: Session):
+    return db.query(models.TokenBlacklist).filter(models.TokenBlacklist.token == token.get_secret_value()).first()

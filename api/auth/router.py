@@ -3,8 +3,9 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
 from api.utils import cryptoUtils, orm_schema
-from api.auth import crud
+from api.auth import crud, schema
 from api.utils.dbUtils import SessionLocal
+
 router = APIRouter()
 
 
@@ -16,8 +17,8 @@ async def get_db():
         db.close()
 
 
-@router.post("/auth/register")
-async def register(user: orm_schema.UserCreate, db: Session = Depends(get_db)):
+@router.post("/auth/register", response_model=orm_schema.UserBase)
+async def register(user: schema.UserCreate, db: Session = Depends(get_db)):
     # check if user exist
     result = await crud.is_user_exist(user.login, db)
     if result:
@@ -28,22 +29,21 @@ async def register(user: orm_schema.UserCreate, db: Session = Depends(get_db)):
 
 
 @router.post("/auth/login")
-async def login(form: OAuth2PasswordRequestForm = Depends()):
+async def login(form: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     # check if user exist
-    result = await crud.is_user_exist(form.username)
-    print(result.get('id'))
+    result = await crud.is_user_exist(form.username, db)
     if not result:
         raise HTTPException(status_code=400, detail='User not found')
     # check password
-    verification = cryptoUtils.verify_password(form.password, result.get('password'))
+    verification = cryptoUtils.verify_password(form.password, result.password)
     if not verification:
         raise HTTPException(status_code=400, detail='Incorrect password')
     response = await cryptoUtils.create_access_token(
-        data={'owner_id': result.get('id')}
+        data={'owner_id': result.id}
     )
     return response
 
 
-# @router.post("/auth/logout")
-# async def logout(body: schema.UserLogout):
-#     return await crud.add_token_to_blacklist(body.token)
+@router.post("/auth/logout")
+async def logout(body: schema.BlacklistToken, db: Session = Depends(get_db)):
+    return await crud.add_token_to_blacklist(body.token, db)

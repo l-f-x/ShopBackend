@@ -1,18 +1,8 @@
 from pydantic import BaseModel, Field, EmailStr, SecretStr, validator
+from api.utils import orm_schema
 
 
-class UserBase(BaseModel):
-    email: EmailStr
-    realname: str = Field(..., example="Ivan Ivanov")
-
-    @validator('realname')
-    def name_must_contain_space(cls, v):
-        if ' ' not in v:
-            raise ValueError('Fullname must contain a space')
-        return v
-
-
-class UserCreate(UserBase):
+class UserCreate(orm_schema.UserBase):
     password: SecretStr = Field(..., example="password")
 
     @validator('password')
@@ -22,5 +12,8 @@ class UserCreate(UserBase):
         return v
 
 
-class UserLogout(BaseModel):
+class BlacklistToken(BaseModel):
     token: SecretStr
+
+    class Config:
+        orm_mode = True

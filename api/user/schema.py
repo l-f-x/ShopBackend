@@ -1,5 +1,6 @@
 from pydantic import BaseModel, SecretStr, validator, EmailStr
 from fastapi import HTTPException
+from api.utils import orm_schema
 from pydantic.datetime_parse import datetime
 
 
@@ -17,14 +18,5 @@ class ChangeRealname(BaseModel):
         return v
 
 
-class UserInfoModel(BaseModel):
-    id: int
-    login: EmailStr
-    real_name: str
-    register_date: datetime
-    status: str
-    role: str
-
-
-class PhotoId(BaseModel):
+class PhotoId(orm_schema.Photo):
     photo_id: int

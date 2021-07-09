@@ -1,5 +1,6 @@
 from sqlalchemy import Table, Column, Integer, String, DateTime, MetaData, Sequence, Boolean, ForeignKey
 from sqlalchemy.dialects.postgresql import BYTEA
+from sqlalchemy.orm.collections import InstrumentedList
 from sqlalchemy.sql.functions import now
 
 from api.utils.dbUtils import Base
@@ -40,6 +41,6 @@ class Photo(Base):
     __tablename__ = 'photos'
     photo_id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
     owner_id = Column(Integer, ForeignKey('users.id'), nullable=False)
-    upload_date = Column(DateTime)
+    upload_date = Column(DateTime, default=now())
     photo = Column(BYTEA)
     owner = relationship("User", back_populates="photos")

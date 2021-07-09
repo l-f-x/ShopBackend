@@ -4,14 +4,14 @@ from pydantic.datetime_parse import datetime
 from pydantic import BaseModel, EmailStr, SecretStr, validator, Field
 
 
-class PhotoBase(BaseModel):
+class CreatePhoto(BaseModel):
     upload_date: datetime
     photo: bytes
-
-
-class Photo(PhotoBase):
-    photo_id: int
     owner_id: int
+
+
+class Photo(CreatePhoto):
+    photo_id: int
 
     class Config:
         orm_mode = True

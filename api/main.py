@@ -11,6 +11,7 @@ from api.utils.dbUtils import engine, SessionLocal
 from api.utils import models
 from api.exceptions.user_exceptions import *
 from api.exceptions.auth_exception import *
+from api.exceptions.product_exceptions import *
 from sqlalchemy.orm import Session
 
 models.Base.metadata.create_all(bind=engine)
@@ -57,3 +58,7 @@ async def email_user_exception_handler(request: Request, exc: UserNotFoundExcept
 @app.exception_handler(TokenExpireException)
 async def token_expire__exception_handler(request: Request, exc: UserNotFoundException):
     raise HTTPException(status_code=401, detail="Token expire")
+
+@app.exception_handler(ProductNotFoundException)
+async def user_not_found_exception(request: Request, exc: UserNotFoundException):
+    raise HTTPException(status_code=400, detail='Product not found')

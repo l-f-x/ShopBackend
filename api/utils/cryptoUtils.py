@@ -1,4 +1,3 @@
-from fastapi import Depends, HTTPException
 from passlib.context import CryptContext
 from pydantic import SecretStr
 import jwt

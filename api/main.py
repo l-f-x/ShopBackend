@@ -36,29 +36,30 @@ async def user_not_found_exception(request: Request, exc: UserNotFoundException)
 
 
 @app.exception_handler(AccessDeniedException)
-async def access_denied_exception_handler(request: Request, exc: UserNotFoundException):
+async def access_denied_exception_handler(request: Request, exc: AccessDeniedException):
     raise HTTPException(status_code=403, detail="Access denied")
 
 
-@app.exception_handler(InvalidPasswordException)
-async def invalid_password_exception_handler(request: Request, exc: UserNotFoundException):
+@app.exception_handler(AccessDeniedException)
+async def invalid_password_exception_handler(request: Request, exc: AccessDeniedException):
     raise HTTPException(status_code=401, detail="Invalid password")
 
 
 @app.exception_handler(InvalidTokenException)
-async def invalid_token_exception_handler(request: Request, exc: UserNotFoundException):
+async def invalid_token_exception_handler(request: Request, exc: InvalidTokenException):
     raise HTTPException(status_code=401, detail="Invalid token")
 
 
 @app.exception_handler(EmailUsedException)
-async def email_user_exception_handler(request: Request, exc: UserNotFoundException):
+async def email_user_exception_handler(request: Request, exc: EmailUsedException):
     raise HTTPException(status_code=400, detail="Email already used")
 
 
 @app.exception_handler(TokenExpireException)
-async def token_expire__exception_handler(request: Request, exc: UserNotFoundException):
+async def token_expire__exception_handler(request: Request, exc: TokenExpireException):
     raise HTTPException(status_code=401, detail="Token expire")
 
+
 @app.exception_handler(ProductNotFoundException)
-async def user_not_found_exception(request: Request, exc: UserNotFoundException):
+async def user_not_found_exception(request: Request):
     raise HTTPException(status_code=400, detail='Product not found')

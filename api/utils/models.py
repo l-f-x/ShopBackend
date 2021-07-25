@@ -17,6 +17,7 @@ class User(Base):
     register_date = Column(DateTime, nullable=False, default=now())
     status = Column(String(1), default='1', nullable=False)
     role = Column(String(10), default='user', nullable=False)
+
     photos = relationship("Photo", back_populates="owner")
     products = relationship("Cart", back_populates="user")
 
@@ -46,6 +47,7 @@ class Photo(Base):
     upload_date = Column(DateTime, default=now())
     photo = Column(BYTEA)
     is_selected_avatar = Column(Boolean, nullable=False, default=True)
+
     owner = relationship("User", back_populates="photos")
 
 
@@ -55,5 +57,6 @@ class Cart(Base):
     user_id = Column(Integer, ForeignKey('users.id'))
     product_id = Column(Integer, ForeignKey('products.id'))
     count = Column(Integer, nullable=False, default=1)
+
     user = relationship("User", back_populates="products")
     product = relationship("Product")

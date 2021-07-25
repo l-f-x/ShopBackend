@@ -23,22 +23,22 @@ async def register(user: schema.UserCreate, db: Session = Depends(get_db)):
     # check if user exist
     result = await crud.is_user_exist(user.login, db)
     if result:
-        raise EmailUsedException
+        raise HTTPException(status_code=400, detail='user exist')
     # add new user if not
     await crud.add_user(user, db)
     return orm_schema.UserBase(**user.dict())
 
 
 @router.post("/auth/login")
-async def login(form: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+async def login(body: schema.UserLogin, db: Session = Depends(get_db)):
     # check if user exist
-    result = await crud.is_user_exist(form.username, db)
+    result = await crud.is_user_exist(body.login, db)
     if not result:
-        raise UserNotFoundException
+        raise HTTPException(status_code=400, detail='User not found')
     # check password
-    verification = cryptoUtils.verify_password(form.password, result.password)
+    verification = cryptoUtils.verify_password(body.password.get_secret_value(), result.password)
     if not verification:
-        raise InvalidPasswordException
+        raise HTTPException(status_code=400, detail='Incorrect password')
     response = await cryptoUtils.create_access_token(
         data={'owner_id': result.id}
     )

@@ -17,3 +17,8 @@ class BlacklistToken(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class UserLogin(BaseModel):
+    login: EmailStr
+    password: SecretStr

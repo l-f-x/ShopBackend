@@ -30,6 +30,7 @@ class TokenBlacklist(Base):
 class Product(Base):
     __tablename__ = 'products'
     id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
+    photo = Column(BYTEA)
     product_name = Column(String(100), nullable=False)
     product_description = Column(String(1000))
     product_price = Column(Integer, nullable=False)
@@ -38,6 +39,7 @@ class Product(Base):
     has_sale = Column(Boolean, nullable=False, default=False)
     price_on_sale = Column(Integer, default=100)
     product_weight = Column(Integer)
+
 
 
 class Photo(Base):
@@ -59,4 +61,4 @@ class Cart(Base):
     count = Column(Integer, nullable=False, default=1)
 
     user = relationship("User", back_populates="products")
-    product = relationship("Product")
+    products = relationship("Product")

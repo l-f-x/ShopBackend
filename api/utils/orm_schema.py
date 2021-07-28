@@ -1,6 +1,7 @@
 from typing import List, Optional
 from pydantic.datetime_parse import datetime
 from pydantic import BaseModel, EmailStr, SecretStr, validator, Field
+from pydantic.schema import Any
 
 
 class ProductBase(BaseModel):
@@ -16,10 +17,17 @@ class ProductBase(BaseModel):
         orm_mode = True
 
 
-class Product(ProductBase):
+class PreProduct(ProductBase):
+
     id: int
     product_views: int
 
+    class Config:
+        orm_mode = True
+
+
+class Product(PreProduct):
+    photo: bytes
 
     class Config:
         orm_mode = True
@@ -72,5 +80,3 @@ class User(UserBase):
 
     class Config:
         orm_mode = True
-
-

@@ -1,3 +1,4 @@
+from email_validator import EmailNotValidError
 from starlette.requests import Request
 
 from api.auth import router as auth_router
@@ -6,6 +7,7 @@ from api.product import router as products_router
 from names import *
 from fastapi import FastAPI, status, Response, HTTPException
 from fastapi.logger import logger
+from fastapi.exceptions import ValidationError, RequestValidationError
 import logging
 from api.utils.dbUtils import engine, SessionLocal
 from api.utils import models
@@ -63,3 +65,5 @@ async def token_expire__exception_handler(request: Request, exc: TokenExpireExce
 @app.exception_handler(ProductNotFoundException)
 async def user_not_found_exception(request: Request):
     raise HTTPException(status_code=400, detail='Product not found')
+
+

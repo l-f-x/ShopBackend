@@ -9,8 +9,9 @@ from api.utils import orm_schema
 from api.utils import models
 
 
-async def add_product(data: orm_schema.ProductCreate, db: Session):
+async def add_product(data: orm_schema.ProductCreate, photo: bytes, db: Session):
     db_product = models.Product(
+        photo=photo,
         product_name=data.product_name,
         product_description=data.product_description,
         product_price=data.product_price,
@@ -29,7 +30,7 @@ async def get_product(product_id: int, db: Session):
     req = product.filter(models.Product.id == product_id)
     product = product.one()
     actual_product_views = product.product_views
-    req.update({models.Product.product_views:actual_product_views+1})
+    req.update({models.Product.product_views: actual_product_views + 1})
     db.commit()
     return product
 
@@ -43,7 +44,7 @@ async def add_product_to_cart(user_id: int, product_id, count: int, db: Session)
     if product_duplicate:
         count_in_cart_now = product_duplicate.count
         db.query(models.Cart).filter(models.User.id == user_id, models.Cart.product_id == product_id).update(
-            {models.Cart.count:count_in_cart_now+1}, synchronize_session='fetch'
+            {models.Cart.count: count_in_cart_now + 1}, synchronize_session='fetch'
         )
         db.commit()
     else:
@@ -68,3 +69,10 @@ async def is_product_exits_in_cart(user_id: int, product_id: int, db: Session):
 async def get_user_cart(user_id: int, db: Session):
     return db.query(models.User).filter(models.User.id == user_id).first()
 
+
+async def search_product(query: str, db: Session):
+    return db.query(models.Product).filter(models.Product.product_name.like('%' + query + '%')).limit(30).all()
+
+
+async def get_product_photo(product_id: int, db: Session):
+    return db.query(models.Product).filter(models.Product.id == product_id).first().photo

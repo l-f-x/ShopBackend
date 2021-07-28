@@ -6,3 +6,4 @@ class UserNotFoundException(Exception):
 class AccessDeniedException(Exception):
     def __init__(self):
         pass
+

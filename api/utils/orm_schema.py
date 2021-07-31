@@ -18,7 +18,6 @@ class ProductBase(BaseModel):
 
 
 class PreProduct(ProductBase):
-
     id: int
     product_views: int
 
@@ -69,12 +68,19 @@ class UserBase(BaseModel):
         return v
 
 
-class User(UserBase):
+class UserInfo(UserBase):
     id: int
-    status: str
     role: str
     balance: int
     register_date: datetime
+
+    class Config:
+        orm_mode = True
+
+
+class User(UserInfo):
+    status: str
+
     photos: List[Photo] = []
     products: List[Cart] = []
 

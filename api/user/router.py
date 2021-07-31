@@ -33,7 +33,7 @@ async def delete_account(auth: schema.Auth, db: Session = Depends(get_db)):
     return await crud.delete_account(user_id, db)
 
 
-@router.post('/users/get_self_info', response_model=orm_schema.User)
+@router.post('/users/get_self_info', response_model=orm_schema.UserInfo)
 async def get_self_info(auth: schema.Auth, db: Session = Depends(get_db)):
     user_id = await cryptoUtils.get_user_id_by_token(auth.token.get_secret_value(), db)
     return await crud.get_user_info(user_id, db)

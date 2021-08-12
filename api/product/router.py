@@ -10,6 +10,7 @@ from starlette.responses import StreamingResponse
 from api.product import schema
 from api.exceptions.user_exceptions import *
 from api.product import crud
+from api.product.schema import CartItem
 from api.user import schema as user_schema
 from api.user.crud import get_user_role
 from api.utils import orm_schema, cryptoUtils
@@ -56,7 +57,7 @@ async def add_to_cart(auth: user_schema.Auth, body: schema.AddToCart, db: Sessio
     return await crud.add_product_to_cart(user_id, body.product_id, body.count, db)
 
 
-@router.get("/product/cart")
+@router.get("/product/cart", response_model=List[CartItem])
 async def get_cart(token: SecretStr, db: Session = Depends(get_db)):
     user_id = await cryptoUtils.get_user_id_by_token(token.get_secret_value(), db)
     return (await crud.get_user_cart(user_id, db))

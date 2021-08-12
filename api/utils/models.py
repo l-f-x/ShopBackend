@@ -54,7 +54,7 @@ class Photo(Base):
 
 
 class Cart(Base):
-    __tablename__ = 'cart'
+    __tablename__ = 'carts'
     id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
     user_id = Column(Integer, ForeignKey('users.id'))
     product_id = Column(Integer, ForeignKey('products.id'))
@@ -62,3 +62,19 @@ class Cart(Base):
 
     user = relationship("User", back_populates="products")
     products = relationship("Product")
+
+class Order(Base):
+    __tablename__ = 'orders'
+    order_id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    date = Column(DateTime, default=now())
+    is_active = Column(Boolean, nullable=False, default=True)
+
+    products = relationship("OrderProduct")
+
+class OrderProduct(Base):
+    __tablename__ = 'order_products'
+    id = Column(Integer, primary_key=True, nullable=False)
+    order_id = Column(Integer, ForeignKey('orders.order_id'), nullable=False)
+    product_id = Column(Integer, ForeignKey('products.id'), nullable=False)
+    count = Column(Integer, nullable=False, default=1)

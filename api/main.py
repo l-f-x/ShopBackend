@@ -4,6 +4,7 @@ from starlette.requests import Request
 from api.auth import router as auth_router
 from api.user import router as user_router
 from api.product import router as products_router
+from api.order import router as order_router
 from names import *
 from fastapi import FastAPI, status, Response, HTTPException
 from fastapi.logger import logger
@@ -22,7 +23,7 @@ app = FastAPI()
 app.include_router(auth_router.router, tags=['Auth'])
 app.include_router(user_router.router, tags=['User'])
 app.include_router(products_router.router, tags=['Products'])
-
+app.include_router(order_router.router, tags=['Order'])
 logger.setLevel(logging.DEBUG)
 
 

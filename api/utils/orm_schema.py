@@ -86,3 +86,9 @@ class User(UserInfo):
 
     class Config:
         orm_mode = True
+
+
+class OrderBase(BaseModel):
+    user_id: int
+    class Config:
+        orm_mode = True

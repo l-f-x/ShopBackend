@@ -44,7 +44,7 @@ async def add_product_to_cart(user_id: int, product_id, count: int, db: Session)
     if product_duplicate:
         count_in_cart_now = product_duplicate.count
         db.query(models.Cart).filter(models.User.id == user_id, models.Cart.product_id == product_id).update(
-            {models.Cart.count: count_in_cart_now + 1}, synchronize_session='fetch'
+            {models.Cart.count: count_in_cart_now + count}, synchronize_session='fetch'
         )
         db.commit()
     else:
@@ -67,7 +67,11 @@ async def is_product_exits_in_cart(user_id: int, product_id: int, db: Session):
 
 
 async def get_user_cart(user_id: int, db: Session):
-    return db.query(models.User).filter(models.User.id == user_id).first()
+    data = db.query(models.Cart).filter(models.Cart.user_id == user_id).all()
+    result = []
+    for value in data:
+        result.append({"count":value.count, "product":value.products})
+    return result
 
 
 async def search_product(query: str, db: Session):
@@ -76,3 +80,7 @@ async def search_product(query: str, db: Session):
 
 async def get_product_photo(product_id: int, db: Session):
     return db.query(models.Product).filter(models.Product.id == product_id).first().photo
+
+
+async def get_product_preview(product_id: int, db: Session):
+    return db.query(models.Product).filter(models.Product.id == product_id).first()

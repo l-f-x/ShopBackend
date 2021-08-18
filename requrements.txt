@@ -13,5 +13,3 @@ bcrypt
 python-multipart
 pyjwt
 alembic
-binascii
-pillow
